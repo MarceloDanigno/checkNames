@@ -1,4 +1,4 @@
-# Unsafe names Checker
+# Unsafe Names Checker
 
 Checks for possible unsafe names present in a specific folder.
 
@@ -22,7 +22,7 @@ python3 checkNames  [path_to_check]
 - ```only_results or create_table``` Is a boolean constant (0 or 1) that defines if you want to export a table (1) or not (0). The table format is values separated by semi-colons.
 - ```table_filename``` is only required if ```only_results or create_table``` is set to 1. This specifies the output text file that you want to save the table on.
 
-An example oF how to use the command is found below:
+An example of how to use the command is found below:
 
 ```
 python3 checkNames home/myFolder 1 1 home/export/table.txt
