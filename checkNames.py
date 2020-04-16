@@ -59,7 +59,7 @@ for name in unsafeNames:
     if (toolNames):
         regex = regex + "[\s!#\[\]~`\"'_\-*(+,;)&$|.]" + name + "[\s!#\[\]~`\"'_\-*(+,;)&$|.]" + "|"
     else:
-        regex = regex + "[\-_\s]" + name + "[-_\s]" + "|"
+        regex = regex + "[\-_\s]" + name + "[\-_\s]" + "|"
     
 regex = regex.rstrip("|")
 regexFunc = re.compile(regex, re.IGNORECASE)
@@ -104,7 +104,9 @@ for tclInterface in tclFiles:
         with open(tclInterface, encoding="utf8", errors='ignore') as f:
             textData = f.read().split("\n")
             f.close()
-            for line in textData:
+            lineCounter = 0
+            while lineCounter < len(textData):
+                line = textData[lineCounter]
                 if (toolNames):
                     if regexFunc.search(line):
                         #print("UNSAFE NAME FOUND IN FILE: " + tclInterface + " . VIOLATED LINE: " + line)
@@ -114,13 +116,30 @@ for tclInterface in tclFiles:
                 else:
                     if not(checkLine(line, regexCommentFunc)) and checkLine(line, regexProcFunc):
                         parameterStart = line.find("{")
+                        optionData = ""
                         if (parameterStart > 0):
+
+                            optionData = line[parameterStart:len(line)]
+                            optionEnd = optionData.find("}")
+                            newLineCounter = 1
+                            while optionEnd == -1:
+                                optionData = optionData + textData[(lineCounter + newLineCounter)]
+                                optionEnd = optionData.find("}")
+                                newLineCounter += 1
+                            optionData = optionData[0:(optionEnd+1)]
+
                             line = line[0:parameterStart]
                         if regexFunc.search(line):
                             print("UNSAFE NAME FOUND IN FILE: " + tclInterface + " . VIOLATED LINE: " + line)
                             currentResult = [tclInterface, line]
                             results.append(currentResult)
                             occurrences += 1
+                        if regexFunc.search(optionData):
+                            print("UNSAFE NAME FOUND IN FILE: " + tclInterface + " . VIOLATED LINE: " + optionData)
+                            currentResult = [tclInterface, optionData]
+                            results.append(currentResult)
+                            occurrences += 1
+                lineCounter += 1
             numFiles += 1
             if (numFiles % 500 == 0):
                 print("Files checked: " + str(numFiles) + ".")
